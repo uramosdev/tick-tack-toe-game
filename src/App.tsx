@@ -235,7 +235,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-4 font-sans text-zinc-100 relative">
+    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-start sm:justify-center p-4 pt-24 sm:pt-4 font-sans text-zinc-100 relative">
       <motion.a
         href="https://uramosdev.up.railway.app/projects"
         target="_blank"
@@ -245,9 +245,9 @@ export default function App() {
         transition={{ duration: 0.5, delay: 0.5 }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed top-6 left-6 z-40 flex items-center gap-2 px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-full text-zinc-400 hover:text-emerald-400 hover:border-emerald-400/30 transition-all text-xs font-bold uppercase tracking-wider"
+        className="fixed top-4 left-4 sm:top-8 sm:left-8 z-40 flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-zinc-900/80 backdrop-blur-md border border-zinc-800 rounded-full text-zinc-400 hover:text-emerald-400 hover:border-emerald-400/30 transition-all text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-lg"
       >
-        <ExternalLink size={14} />
+        <ExternalLink size={14} className="sm:w-4 sm:h-4 w-3.5 h-3.5" />
         Return
       </motion.a>
 
