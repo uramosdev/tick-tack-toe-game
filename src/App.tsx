@@ -60,11 +60,17 @@ export default function App() {
   const [isAiMode, setIsAiMode] = useState(true);
   const [difficulty, setDifficulty] = useState<'Easy' | 'Medium' | 'Hard'>('Hard');
   const [showSplash, setShowSplash] = useState(true);
+  const [matchWinner, setMatchWinner] = useState<Player>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 2000);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (scores.X >= 3) setMatchWinner('X');
+    if (scores.O >= 3) setMatchWinner('O');
+  }, [scores]);
 
   const calculateWinner = (squares: Player[]) => {
     const lines = [
@@ -205,9 +211,13 @@ export default function App() {
     if (result) {
       setWinner(result.winner);
       setWinningLine(result.line);
-      if (result.winner === 'X') setScores(s => ({ ...s, X: s.X + 3 }));
-      else if (result.winner === 'O') setScores(s => ({ ...s, O: s.O + 3 }));
-      else setScores(s => ({ ...s, Draws: s.Draws + 1 }));
+      if (result.winner === 'X') {
+        setScores(s => ({ ...s, X: s.X + 1 }));
+      } else if (result.winner === 'O') {
+        setScores(s => ({ ...s, O: s.O + 1 }));
+      } else if (result.winner === 'Draw') {
+        setScores(s => ({ ...s, Draws: s.Draws + 1 }));
+      }
     }
   };
 
@@ -216,6 +226,12 @@ export default function App() {
     setIsXNext(true);
     setWinner(null);
     setWinningLine(null);
+  };
+
+  const resetMatch = () => {
+    resetGame();
+    setScores({ X: 0, O: 0, Draws: 0 });
+    setMatchWinner(null);
   };
 
   return (
@@ -346,7 +362,8 @@ export default function App() {
             </div>
             <div className="text-2xl font-bold flex items-center justify-center gap-1">
               {scores.X}
-              <Trophy size={14} className="text-emerald-400/50" />
+              <span className="text-xs text-zinc-500 font-normal">/3</span>
+              <Trophy size={14} className={scores.X >= 1 ? "text-emerald-400" : "text-zinc-800"} />
             </div>
           </div>
           <div className="bg-zinc-900 p-4 rounded-2xl border border-zinc-800 shadow-sm text-center">
@@ -363,7 +380,8 @@ export default function App() {
             </div>
             <div className="text-2xl font-bold flex items-center justify-center gap-1">
               {scores.O}
-              <Trophy size={14} className="text-zinc-400/50" />
+              <span className="text-xs text-zinc-500 font-normal">/3</span>
+              <Trophy size={14} className={scores.O >= 1 ? "text-zinc-400" : "text-zinc-800"} />
             </div>
           </div>
         </div>
@@ -404,7 +422,7 @@ export default function App() {
 
           {/* Winner Overlay */}
           <AnimatePresence>
-            {winner && (
+            {winner && !matchWinner && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -422,25 +440,9 @@ export default function App() {
                         initial={{ scale: 0, y: 10 }}
                         animate={{ scale: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="text-emerald-400/40"
-                      >
-                        <Trophy size={32} />
-                      </motion.div>
-                      <motion.div
-                        initial={{ scale: 0, y: 10 }}
-                        animate={{ scale: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
                         className="text-emerald-400"
                       >
                         <Trophy size={48} />
-                      </motion.div>
-                      <motion.div
-                        initial={{ scale: 0, y: 10 }}
-                        animate={{ scale: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="text-emerald-400/40"
-                      >
-                        <Trophy size={32} />
                       </motion.div>
                     </div>
                   )}
@@ -448,13 +450,50 @@ export default function App() {
                     {winner === 'Draw' ? "No Winner" : (isAiMode && winner === 'O' ? "AI Wins!" : `Player ${winner} Wins!`)}
                   </h2>
                   {winner !== 'Draw' && (
-                    <p className="text-emerald-400 text-sm font-bold uppercase tracking-widest mb-6">+3 CUPS EARNED</p>
+                    <p className="text-emerald-400 text-sm font-bold uppercase tracking-widest mb-6">+1 CUP EARNED</p>
                   )}
                   <button
                     onClick={resetGame}
                     className="bg-emerald-400 text-zinc-950 px-8 py-3 rounded-xl font-bold hover:bg-emerald-300 transition-all active:scale-95 flex items-center gap-2 mx-auto"
                   >
-                    Play Again
+                    Next Round
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Match Winner Overlay */}
+          <AnimatePresence>
+            {matchWinner && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="absolute inset-0 z-20 flex items-center justify-center bg-zinc-950/90 backdrop-blur-md rounded-3xl"
+              >
+                <div className="bg-zinc-900 p-10 rounded-2xl shadow-2xl border-2 border-emerald-400/30 text-center">
+                  <div className="flex justify-center gap-2 mb-6">
+                    <motion.div
+                      animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.1, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="text-emerald-400"
+                    >
+                      <Trophy size={64} />
+                    </motion.div>
+                  </div>
+                  <h2 className="text-3xl font-bold mb-2 text-white">
+                    MATCH COMPLETE
+                  </h2>
+                  <p className="text-zinc-400 mb-8 font-medium">
+                    {isAiMode && matchWinner === 'O' ? "THE AI IS THE CHAMPION!" : `PLAYER ${matchWinner} IS THE CHAMPION!`}
+                  </p>
+                  <button
+                    onClick={resetMatch}
+                    className="bg-emerald-400 text-zinc-950 px-10 py-4 rounded-xl font-black hover:bg-emerald-300 transition-all active:scale-95 flex items-center gap-3 mx-auto shadow-[0_0_20px_rgba(52,211,153,0.3)]"
+                  >
+                    <RotateCcw size={20} />
+                    RESET MATCH
                   </button>
                 </div>
               </motion.div>
