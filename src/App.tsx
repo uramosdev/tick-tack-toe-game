@@ -237,7 +237,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-4 font-sans text-zinc-100 relative">
       <motion.a
-        href="https://uramosdev.up.railway.app/blog"
+        href="https://uramosdev.up.railway.app/projects"
         target="_blank"
         rel="noopener noreferrer"
         initial={{ opacity: 0, x: -20 }}
